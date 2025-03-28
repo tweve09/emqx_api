@@ -32,6 +32,60 @@ async function listConnectedClients() {
   }
 }
 
+async function getClientDetails(clientId) {
+  try {
+    const response = await axios.get(`${EMQX_API_URL}/clients/${clientId}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error getting client details:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+async function publishMessage(topic, payload, qos = 0, retain = false) {
+  try {
+    const response = await axios.post(
+      `${EMQX_API_URL}/mqtt/publish`,
+      {
+        topic,
+        payload,
+        qos,
+        retain,
+      },
+      {
+        headers: getAuthHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error publishing message:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+async function disconnectClient(clientId) {
+  try {
+    const response = await axios.delete(`${EMQX_API_URL}/clients/${clientId}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error disconnecting client:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
 listConnectedClients()
   .then((clients) => {
     console.log("Connected clients:", clients);
